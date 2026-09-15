@@ -37,8 +37,7 @@ const LoginScreen = () => {
       return;
     }
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000";
+    const BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
     const routeByRole = async () => {
       try {

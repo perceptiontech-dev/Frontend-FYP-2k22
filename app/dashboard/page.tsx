@@ -6,6 +6,7 @@ import UploadCIS from "./uploadcis";
 import ManageCIS from "./managecis";
 import ManageUsers from "./manageuser";
 import ManageBlooms from "./managebloom";
+import { API_BASE_URL } from "../lib/api";
 
 // Local prop-compatible aliases.
 // This fixes the dashboard TypeScript error without changing
@@ -19,7 +20,6 @@ const SSUET_LOGO_URL =
 const PROFILE_FALLBACK_URL =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDALNG9EIxj1WfvhhlCoO_-lzrx4llQVe2C5TI09cG_YK9ibxFGWdkGj1LW-0O9iQ5EVPDXMztuwZEfQFFcvkp4oLDyp78KhjYnrnhqOS4B7rC16jA_D-RLWkhhzQs9zz2YGZPoE6_giCvkUtadhwT3OzRcz3TEI0zqr3U3MEAdYUmr0EDC_SHlY0dvJpI7H7I8OIx-NRrpu8R5v7ieXRvfW7fxYJNGtCgLXdAog4zlj3Crqzl8iFEC";
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 const token = () => (typeof window !== "undefined" ? localStorage.getItem("access_token") || "" : "");
 
 export default function DashboardScreen() {

@@ -6,6 +6,7 @@ import {
   DragEvent,
   FormEvent,
 } from "react";
+import { API_BASE_URL } from "../lib/api";
 
 interface UploadCISProps {
   onClose: () => void;
@@ -261,8 +262,6 @@ export default function UploadCIS({
     setIsUploading(true);
 
     try {
-      const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
-
       const payload = new FormData();
 
       payload.append(

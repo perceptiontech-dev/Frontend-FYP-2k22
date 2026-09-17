@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { API_BASE_URL } from "../lib/api";
 
 interface ManageUsersProps {
   onClose: () => void;
@@ -37,8 +38,6 @@ export default function ManageUsers({
   } | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-
-  const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
   const getToken = () =>
     typeof window !== "undefined"

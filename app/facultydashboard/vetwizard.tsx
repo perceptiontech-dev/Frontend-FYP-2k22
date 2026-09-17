@@ -10,6 +10,7 @@ import "katex/dist/katex.min.css";
 import { readReportStream } from "./utils/streamParser";
 import { generateReportPDF } from "./pdfGenerator";
 import { getAuthContext, saveToHistory } from "./history";
+import { API_BASE_URL } from "../lib/api";
 
 // ─────────────────────────────────────────────────────────────
 // SEARCHABLE SELECT
@@ -902,8 +903,7 @@ export default function VetWizard({
   onFinish,
   onHistorySaved,
 }: VetWizardProps) {
-  const BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
-  const API = `${BASE_URL}/api/v1`;
+  const API = `${API_BASE_URL}/api/v1`;
 
   const token = () =>
     typeof window !== "undefined" ? localStorage.getItem("access_token") || "" : "";

@@ -8,6 +8,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { API_BASE_URL } from "../lib/api";
 
 interface UploadLecturesProps {
   onClose: () => void;
@@ -92,7 +93,6 @@ export default function UploadLectures({
     setFileStatuses(initialStatuses);
     setProgressMsg("Uploading files...");
 
-    const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
     const formData = new FormData();
 

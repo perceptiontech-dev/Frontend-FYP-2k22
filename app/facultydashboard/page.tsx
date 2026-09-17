@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import VetWizard from "./vetwizard";
 import Chat from "./chat";
 import { HistoryDashboard, getAuthContext, HistoryEntry, ApiHistoryReport } from "./history";
+import { API_BASE_URL } from "../lib/api";
 
 export interface CISItem {
   cis_id: string;
@@ -21,7 +22,6 @@ const SSUET_LOGO_URL =
 const PROFILE_FALLBACK_URL =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDALNG9EIxj1WfvhhlCoO_-lzrx4llQVe2C5TI09cG_YK9ibxFGWdkGj1LW-0O9iQ5EVPDXMztuwZEfQFFcvkp4oLDyp78KhjYnrnhqOS4B7rC16jA_D-RLWkhhzQs9zz2YGZPoE6_giCvkUtadhwT3OzRcz3TEI0zqr3U3MEAdYUmr0EDC_SHlY0dvJpI7H7I8OIx-NRrpu8R5v7ieXRvfW7fxYJNGtCgLXdAog4zlj3Crqzl8iFEC";
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 const token = () => (typeof window !== "undefined" ? localStorage.getItem("access_token") || "" : "");
 
 type ActiveView = "dashboard" | "history" | "chat" | "vet";

@@ -5,12 +5,11 @@ import { createPortal } from "react-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { generateReportPDF } from "./pdfGenerator";
+import { API_BASE_URL } from "../lib/api";
 
 /* ============================================================
    API CONFIG
 ============================================================ */
-
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
 const API_BASE = API_BASE_URL.replace(/\/+$/, "").endsWith("/api/v1")
   ? API_BASE_URL.replace(/\/+$/, "")

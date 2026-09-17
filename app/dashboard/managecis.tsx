@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { API_BASE_URL } from "../lib/api";
 
 interface ManageCISProps {
   onClose?: () => void;
@@ -16,8 +17,6 @@ export default function ManageCIS({
   const [cisItems, setCisItems] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
-  const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
   const loadCis = async () => {
     try {

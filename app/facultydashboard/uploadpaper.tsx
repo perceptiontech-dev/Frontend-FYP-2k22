@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { API_BASE_URL } from "../lib/api";
 
 interface UploadPaperProps {
   onClose: () => void;
@@ -99,7 +100,6 @@ export default function UploadPaper({
     const formData = new FormData();
     formData.append("file", file);
 
-    const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
     try {
       const token =

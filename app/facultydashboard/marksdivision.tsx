@@ -7,6 +7,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { readReportStream } from "./utils/streamParser";
+import { API_BASE_URL } from "../lib/api";
 
 interface MarksDivisionScreenProps {
   onNext?: () => void;
@@ -42,7 +43,6 @@ export default function MarksDivisionScreen({
     setIsLoading(true);
     setReport("");
 
-    const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
     try {
       const token =
         localStorage.getItem("access_token") || "";

@@ -7,6 +7,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { readReportStream } from "./utils/streamParser";
+import { API_BASE_URL } from "../lib/api";
 
 interface QuestionCheckProps {
   onNext?: () => void;
@@ -173,7 +174,6 @@ export default function QuestionCheckScreen({ onNext, onBack, cisLink, paperLink
 
   const generateReport = async (signal: AbortSignal) => {
     setIsLoading(true); setReport("");
-    const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
     try {
       let url: string; let init: RequestInit;
       const token = localStorage.getItem("access_token") || "";

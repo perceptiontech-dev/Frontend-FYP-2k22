@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../lib/api";
 
 interface CreateUserFormProps {
   onClose: () => void;
@@ -188,8 +189,6 @@ export function CreateUserForm({
     setIsSubmitting(true);
 
     try {
-      const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
-
       const token =
         localStorage.getItem("access_token") || "";
 

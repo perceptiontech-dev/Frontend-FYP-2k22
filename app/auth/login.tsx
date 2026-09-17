@@ -12,12 +12,11 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "../lib/api";
 
 // ── API Base URL (single source of truth) ──────────────────────────────────
 // Vercel env variable: NEXT_PUBLIC_API_URL
 // Trailing slashes are stripped to prevent double-slash URLs.
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
-
 const SSUET_LOGO_URL =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuAw_Jy9oKpU48zPIiRFe5J9eDkOHLkxlx-moRd6vnn6lTW6gsK0U7BgBGmASmKvCNf03LEPRd6fX4R6FuigJrIyeIX8pveVxlpPy3skCeTXvfUkh8AHzHz-SuUbMosjCKJbahHrXnvP5OX0ucUUWBRp8e2IyREClansm0N-JRwzmtSazXzvnot2pWxcMhPKLIl5LBwz80Fh-UdW9DY1rhmiFgmNp1gR2qwyIU7dpGSzHXKu3Da7D4knlns4TylKkz1EVQ";
 

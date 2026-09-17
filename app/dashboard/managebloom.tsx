@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { API_BASE_URL } from "../lib/api";
 
 interface ManageBloomsProps {
   onClose: () => void;
@@ -51,8 +52,6 @@ export default function ManageBlooms({
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [reportError, setReportError] = useState("");
   const [reportVisible, setReportVisible] = useState(false);
-
-  const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
   const token = () => {
     if (typeof window === "undefined") return "";

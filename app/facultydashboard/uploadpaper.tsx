@@ -99,16 +99,14 @@ export default function UploadPaper({
     const formData = new FormData();
     formData.append("file", file);
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BACKEND_API ||
-      "http://localhost:8000";
+    const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
     try {
       const token =
         localStorage.getItem("access_token") || "";
 
       const response = await fetch(
-        `${baseUrl}/api/v1/paper/upload`,
+        `${API_BASE_URL}/api/v1/paper/upload`,
         {
           method: "POST",
           headers: {

@@ -38,8 +38,7 @@ export default function ManageUsers({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000";
+  const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
   const getToken = () =>
     typeof window !== "undefined"
@@ -59,7 +58,7 @@ export default function ManageUsers({
     }
 
     try {
-      const response = await fetch(`${baseUrl}/api/v1/users`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -137,7 +136,7 @@ export default function ManageUsers({
     setDeleteError(null);
 
     try {
-      const response = await fetch(`${baseUrl}/api/v1/users/${uid}`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/users/${uid}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -173,7 +173,7 @@ export default function QuestionCheckScreen({ onNext, onBack, cisLink, paperLink
 
   const generateReport = async (signal: AbortSignal) => {
     setIsLoading(true); setReport("");
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000";
+    const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
     try {
       let url: string; let init: RequestInit;
       const token = localStorage.getItem("access_token") || "";
@@ -181,10 +181,10 @@ export default function QuestionCheckScreen({ onNext, onBack, cisLink, paperLink
         const formData = new FormData();
         formData.append("cis_link", cisLink!); formData.append("paper_link", paperLink!); formData.append("session_id", sessionId || "");
         lectureFiles.forEach((file) => formData.append("files", file));
-        url = `${baseUrl}/api/v1/analyzer/reports/questions-check-with-lectures`;
+        url = `${API_BASE_URL}/api/v1/analyzer/reports/questions-check-with-lectures`;
         init = { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: formData, signal };
       } else {
-        url = `${baseUrl}/api/v1/analyzer/reports/questions-check`;
+        url = `${API_BASE_URL}/api/v1/analyzer/reports/questions-check`;
         init = { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ cis_link: cisLink, paper_link: paperLink, session_id: sessionId || null }), signal };
       }
       const response = await fetch(url, init);

@@ -19,7 +19,7 @@ const SSUET_LOGO_URL =
 const PROFILE_FALLBACK_URL =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDALNG9EIxj1WfvhhlCoO_-lzrx4llQVe2C5TI09cG_YK9ibxFGWdkGj1LW-0O9iQ5EVPDXMztuwZEfQFFcvkp4oLDyp78KhjYnrnhqOS4B7rC16jA_D-RLWkhhzQs9zz2YGZPoE6_giCvkUtadhwT3OzRcz3TEI0zqr3U3MEAdYUmr0EDC_SHlY0dvJpI7H7I8OIx-NRrpu8R5v7ieXRvfW7fxYJNGtCgLXdAog4zlj3Crqzl8iFEC";
 
-const baseUrl = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000";
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 const token = () => (typeof window !== "undefined" ? localStorage.getItem("access_token") || "" : "");
 
 export default function DashboardScreen() {
@@ -95,7 +95,7 @@ export default function DashboardScreen() {
 
     const loadDashboard = async () => {
       try {
-        const response = await fetch(`${baseUrl}/api/v1/users/me`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/users/me`, {
           headers: { Authorization: `Bearer ${token()}` },
         });
         if (!response.ok) throw new Error("Failed to load user info");
@@ -110,9 +110,9 @@ export default function DashboardScreen() {
         setProfileImage(userInfo?.user_profile_image_link || null);
 
         const [usersResponse, cisResponse, statsResponse] = await Promise.all([
-          fetch(`${baseUrl}/api/v1/users`, { headers: { Authorization: `Bearer ${token()}` } }),
-          fetch(`${baseUrl}/api/v1/cis`, { headers: { Authorization: `Bearer ${token()}` } }),
-          fetch(`${baseUrl}/api/v1/admin/stats`, { headers: { Authorization: `Bearer ${token()}` } }),
+          fetch(`${API_BASE_URL}/api/v1/users`, { headers: { Authorization: `Bearer ${token()}` } }),
+          fetch(`${API_BASE_URL}/api/v1/cis`, { headers: { Authorization: `Bearer ${token()}` } }),
+          fetch(`${API_BASE_URL}/api/v1/admin/stats`, { headers: { Authorization: `Bearer ${token()}` } }),
         ]);
 
         if (usersResponse.ok) {
@@ -172,7 +172,7 @@ export default function DashboardScreen() {
   const handleLogout = async () => {
     try {
       if (token()) {
-        await fetch(`${baseUrl}/api/v1/auth/logout`, {
+        await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token()}` },
         });
@@ -208,10 +208,10 @@ export default function DashboardScreen() {
     try {
       const url =
         deleteTarget.type === "user"
-          ? `${baseUrl}/api/v1/users/${deleteTarget.id}`
+          ? `${API_BASE_URL}/api/v1/users/${deleteTarget.id}`
           : deleteTarget.type === "bloom"
-            ? `${baseUrl}/api/v1/blooms/${deleteTarget.id}`
-            : `${baseUrl}/api/v1/cis/${deleteTarget.id}`;
+            ? `${API_BASE_URL}/api/v1/blooms/${deleteTarget.id}`
+            : `${API_BASE_URL}/api/v1/cis/${deleteTarget.id}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token()}` },

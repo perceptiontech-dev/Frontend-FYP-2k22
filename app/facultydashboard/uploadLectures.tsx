@@ -92,9 +92,7 @@ export default function UploadLectures({
     setFileStatuses(initialStatuses);
     setProgressMsg("Uploading files...");
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BACKEND_API ||
-      "http://localhost:8000";
+    const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
     const formData = new FormData();
 
@@ -109,7 +107,7 @@ export default function UploadLectures({
         localStorage.getItem("access_token") || "";
 
       const resp = await fetch(
-        `${baseUrl}/api/v1/analyzer/lectures/ingest`,
+        `${API_BASE_URL}/api/v1/analyzer/lectures/ingest`,
         {
           method: "POST",
           headers: {
@@ -130,7 +128,7 @@ export default function UploadLectures({
       pollRef.current = setInterval(async () => {
         try {
           const statusResp = await fetch(
-            `${baseUrl}/api/v1/analyzer/lectures/ingest-status/${vetSessionId}`,
+            `${API_BASE_URL}/api/v1/analyzer/lectures/ingest-status/${vetSessionId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

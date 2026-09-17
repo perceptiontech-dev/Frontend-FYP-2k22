@@ -17,8 +17,7 @@ export default function ManageCIS({
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000";
+  const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
   const loadCis = async () => {
     try {
@@ -32,7 +31,7 @@ export default function ManageCIS({
         return;
       }
 
-      const response = await fetch(`${baseUrl}/api/v1/cis`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/cis`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

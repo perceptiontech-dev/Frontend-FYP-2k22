@@ -52,9 +52,7 @@ export default function ManageBlooms({
   const [reportError, setReportError] = useState("");
   const [reportVisible, setReportVisible] = useState(false);
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BACKEND_API ||
-    "http://localhost:8000";
+  const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
   const token = () => {
     if (typeof window === "undefined") return "";
@@ -71,7 +69,7 @@ export default function ManageBlooms({
       setIsLoading(true);
 
       const response = await fetch(
-        `${baseUrl}/api/v1/blooms`,
+        `${API_BASE_URL}/api/v1/blooms`,
         {
           headers: {
             Authorization: `Bearer ${token()}`,
@@ -153,7 +151,7 @@ export default function ManageBlooms({
       payload.append("file", selectedFile);
 
       const response = await fetch(
-        `${baseUrl}/api/v1/blooms/upload`,
+        `${API_BASE_URL}/api/v1/blooms/upload`,
         {
           method: "POST",
           headers: {
@@ -360,7 +358,7 @@ export default function ManageBlooms({
 
     try {
       const response = await fetch(
-        `${baseUrl}/api/v1/analyzer/reports/bloom-taxonomy`,
+        `${API_BASE_URL}/api/v1/analyzer/reports/bloom-taxonomy`,
         {
           method: "POST",
           headers: {

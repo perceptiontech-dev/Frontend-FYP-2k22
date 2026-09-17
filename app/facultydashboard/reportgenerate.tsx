@@ -128,7 +128,7 @@ export default function ReportGenerateScreen({
 
     let fullReport = "";
 
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000";
+    const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
     try {
       const token = localStorage.getItem("access_token") || "";
@@ -140,7 +140,7 @@ export default function ReportGenerateScreen({
       // ========================================================
 
       if (hasSubReports) {
-        response = await fetch(`${baseUrl}/api/v1/analyzer/reports/final/synthesize`, {
+        response = await fetch(`${API_BASE_URL}/api/v1/analyzer/reports/final/synthesize`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -164,7 +164,7 @@ export default function ReportGenerateScreen({
       // ========================================================
 
       else {
-        response = await fetch(`${baseUrl}/api/v1/analyzer/reports/final`, {
+        response = await fetch(`${API_BASE_URL}/api/v1/analyzer/reports/final`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -36,16 +36,14 @@ export default function VETScreen4({
     setIsLoading(true);
     setReport("");
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BACKEND_API ||
-      "http://localhost:8000";
+    const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
     try {
       const token =
         localStorage.getItem("access_token") || "";
 
       const response = await fetch(
-        `${baseUrl}/api/v1/analyzer/reports/clo-mapping`,
+        `${API_BASE_URL}/api/v1/analyzer/reports/clo-mapping`,
         {
           method: "POST",
           headers: {

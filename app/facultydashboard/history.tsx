@@ -864,6 +864,22 @@ async function downloadReportPDF(
 }
 
 /* ============================================================
+   SHARED SKELETON PRIMITIVE
+   ------------------------------------------------------------
+   Used across the header stats, the results list, and anywhere
+   else on this page that needs a loading placeholder, so every
+   pulse matches in color, radius, and timing.
+============================================================ */
+
+function SkeletonBlock({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`animate-pulse rounded-md bg-slate-200 dark:bg-white/10 ${className}`}
+    />
+  );
+}
+
+/* ============================================================
    DELETE CONFIRMATION MODAL (PORTAL)
    ------------------------------------------------------------
    Rendered via createPortal to document.body so it escapes any
@@ -1743,6 +1759,17 @@ export function HistoryDashboard({
   );
 
   /* ============================================================
+     LOADING STATE FOR STAT TILES
+     ------------------------------------------------------------
+     Only treat this as a "first load" skeleton state — once any
+     data has arrived, further background refreshes (search,
+     filter, pagination) don't blank the tiles out again.
+  ============================================================ */
+
+  const statsLoading =
+    (!authReady || loading) && entries.length === 0 && !loadError;
+
+  /* ============================================================
      AUTH LOADING
   ============================================================ */
 
@@ -1787,99 +1814,106 @@ export function HistoryDashboard({
           MAIN CONTENT
       ============================================================ */}
 
-      <div className="w-full min-w-0 space-y-5 overflow-x-hidden px-3 sm:space-y-6 sm:px-0">
+      <div className="w-full min-w-0 space-y-4 overflow-x-hidden px-2 min-[300px]:px-2.5 min-[360px]:px-3 min-[360px]:space-y-5 sm:space-y-6 sm:px-0">
 
-        {/* TOP HEADER */}
-        <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 items-start gap-3 sm:gap-4">
-            <div className="min-w-0">
-              <div className="mb-1 flex items-center gap-2">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 sm:h-8 sm:w-8">
-                  <span className="material-symbols-outlined text-[16px] sm:text-[18px]">
-                    history
+        {/* TOP HEADER — now a bordered/white card matching the rest
+            of the page (stat tiles, result rows), instead of sitting
+            directly on the page background. */}
+        <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-white/[0.07] dark:bg-white/[0.025] min-[360px]:rounded-2xl min-[360px]:p-4 sm:p-5 lg:p-6">
+          {/* subtle decorative accent, consistent with the report-detail header */}
+          <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-emerald-400/10 blur-2xl" />
+
+          <div className="relative flex flex-col gap-3 min-[360px]:gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 items-start gap-2.5 min-[360px]:gap-3 sm:gap-4">
+              <div className="min-w-0">
+                <div className="mb-1 flex items-center gap-1.5 min-[360px]:gap-2">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 min-[360px]:h-7 min-[360px]:w-7 sm:h-8 sm:w-8">
+                    <span className="material-symbols-outlined text-[14px] min-[360px]:text-[16px] sm:text-[18px]">
+                      history
+                    </span>
                   </span>
-                </span>
 
-                <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-600 dark:text-emerald-400 sm:text-xs">
-                  IntelliPaper
-                </span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-emerald-600 dark:text-emerald-400 min-[360px]:text-[11px] min-[360px]:tracking-[0.14em] sm:text-xs">
+                    IntelliPaper
+                  </span>
+                </div>
+
+                <h1 className="truncate text-lg font-bold tracking-tight text-slate-900 dark:text-white min-[360px]:text-xl sm:text-2xl sm:whitespace-normal lg:text-3xl">
+                  {viewing
+                    ? "Vetting Report"
+                    : "Moderation History"}
+                </h1>
+
+                <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 min-[360px]:text-xs sm:text-sm">
+                  {viewing
+                    ? "Review the complete AI-generated academic assessment."
+                    : "Review, search and manage previously vetted papers."}
+                </p>
               </div>
-
-              <h1 className="truncate text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl sm:whitespace-normal lg:text-3xl">
-                {viewing
-                  ? "Vetting Report"
-                  : "Moderation History"}
-              </h1>
-
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
-                {viewing
-                  ? "Review the complete AI-generated academic assessment."
-                  : "Review, search and manage previously vetted papers."}
-              </p>
             </div>
+
+            {viewing && (
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                <button
+                  onClick={() =>
+                    handleDownloadMarkdown(viewing)
+                  }
+                  disabled={
+                    downloadingMarkdown === viewing.id
+                  }
+                  className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-emerald-200 bg-white px-3 text-[11px] font-semibold text-emerald-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-emerald-500/20 dark:bg-white/[0.03] dark:text-emerald-400 dark:hover:bg-emerald-500/10 min-[360px]:h-10 min-[360px]:gap-2 min-[360px]:px-4 min-[360px]:text-xs sm:h-11 sm:w-auto sm:px-5 sm:text-sm"
+                >
+                  <span className="material-symbols-outlined text-[16px] min-[360px]:text-[18px] sm:text-[19px]">
+                    markdown
+                  </span>
+
+                  {downloadingMarkdown === viewing.id
+                    ? "Preparing..."
+                    : "Download .md"}
+                </button>
+
+                <button
+                  onClick={() => handleDownload(viewing)}
+                  disabled={downloading === viewing.id}
+                  className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-3 text-[11px] font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 min-[360px]:h-10 min-[360px]:gap-2 min-[360px]:px-4 min-[360px]:text-xs sm:h-11 sm:w-auto sm:px-5 sm:text-sm"
+                >
+                  <span className="material-symbols-outlined text-[16px] min-[360px]:text-[18px] sm:text-[19px]">
+                    picture_as_pdf
+                  </span>
+
+                  {downloading === viewing.id
+                    ? "Preparing PDF..."
+                    : "Download PDF"}
+                </button>
+              </div>
+            )}
           </div>
-
-          {viewing && (
-            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-              <button
-                onClick={() =>
-                  handleDownloadMarkdown(viewing)
-                }
-                disabled={
-                  downloadingMarkdown === viewing.id
-                }
-                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 text-xs font-semibold text-emerald-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 dark:border-emerald-500/20 dark:bg-white/[0.03] dark:text-emerald-400 dark:hover:bg-emerald-500/10 sm:h-11 sm:w-auto sm:px-5 sm:text-sm"
-              >
-                <span className="material-symbols-outlined text-[18px] sm:text-[19px]">
-                  markdown
-                </span>
-
-                {downloadingMarkdown === viewing.id
-                  ? "Preparing..."
-                  : "Download .md"}
-              </button>
-
-              <button
-                onClick={() => handleDownload(viewing)}
-                disabled={downloading === viewing.id}
-                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-xs font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 sm:h-11 sm:w-auto sm:px-5 sm:text-sm"
-              >
-                <span className="material-symbols-outlined text-[18px] sm:text-[19px]">
-                  picture_as_pdf
-                </span>
-
-                {downloading === viewing.id
-                  ? "Preparing PDF..."
-                  : "Download PDF"}
-              </button>
-            </div>
-          )}
         </div>
 
         {/* DETAIL VIEW */}
         {viewing ? (
           <div className="space-y-5 sm:space-y-6">
-            <div className="relative overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-4 shadow-sm dark:border-emerald-500/10 dark:from-emerald-500/[0.08] dark:via-white/[0.02] dark:to-teal-500/[0.06] sm:p-6">
+            <div className="relative overflow-hidden rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-3 shadow-sm dark:border-emerald-500/10 dark:from-emerald-500/[0.08] dark:via-white/[0.02] dark:to-teal-500/[0.06] min-[360px]:rounded-2xl min-[360px]:p-4 sm:p-6">
               <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-emerald-400/10 blur-2xl" />
 
-              <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-                <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 sm:h-14 sm:w-14">
-                    <span className="material-symbols-outlined text-[24px] sm:text-[30px]">
+              <div className="relative flex flex-col gap-4 min-[360px]:gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+                <div className="flex min-w-0 items-center gap-2.5 min-[360px]:gap-3 sm:gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 min-[360px]:h-11 min-[360px]:w-11 sm:h-14 sm:w-14">
+                    <span className="material-symbols-outlined text-[20px] min-[360px]:text-[24px] sm:text-[30px]">
                       verified
                     </span>
                   </div>
 
                   <div className="min-w-0">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 min-[360px]:text-[11px]">
                       AI Assessment Complete
                     </p>
 
-                    <h2 className="mt-1 text-lg font-bold text-slate-900 dark:text-white sm:text-xl">
+                    <h2 className="mt-1 text-base font-bold text-slate-900 dark:text-white min-[360px]:text-lg sm:text-xl">
                       Final Vetting Report
                     </h2>
 
-                    <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
+                    <p className="mt-1 truncate text-[11px] text-slate-500 dark:text-slate-400 min-[360px]:text-xs sm:text-sm">
                       {viewing.courseCode || "—"} ·{" "}
                       {viewing.courseName || "Untitled Report"}
                     </p>
@@ -1887,18 +1921,18 @@ export function HistoryDashboard({
                 </div>
 
                 <div className="shrink-0 sm:text-right">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 min-[360px]:text-[11px]">
                     Compliance Score
                   </p>
 
-                  <p className="mt-1 text-3xl font-black tracking-tight text-emerald-600 dark:text-emerald-400 sm:text-4xl">
+                  <p className="mt-1 text-2xl font-black tracking-tight text-emerald-600 dark:text-emerald-400 min-[360px]:text-3xl sm:text-4xl">
                     {scoreFor(viewing).score !== null
                       ? `${scoreFor(viewing).score}%`
                       : "—"}
                   </p>
 
                   <span
-                    className={`mt-1 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold ${
+                    className={`mt-1 inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold min-[360px]:text-xs ${
                       scoreFor(viewing).badge
                     }`}
                   >
@@ -1937,21 +1971,21 @@ export function HistoryDashboard({
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-white/[0.07] dark:bg-white/[0.025] sm:p-4"
+                  className="min-w-0 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-white/[0.07] dark:bg-white/[0.025] min-[360px]:rounded-2xl min-[360px]:p-3.5 sm:p-4"
                 >
-                  <div className="flex min-w-0 items-start gap-2.5 sm:gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-white/[0.06] dark:text-slate-300 sm:h-10 sm:w-10">
-                      <span className="material-symbols-outlined text-[17px] sm:text-[19px]">
+                  <div className="flex min-w-0 items-start gap-2 min-[360px]:gap-2.5 sm:gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-white/[0.06] dark:text-slate-300 min-[360px]:h-9 min-[360px]:w-9 sm:h-10 sm:w-10">
+                      <span className="material-symbols-outlined text-[15px] min-[360px]:text-[17px] sm:text-[19px]">
                         {item.icon}
                       </span>
                     </div>
 
                     <div className="min-w-0">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 sm:text-[11px]">
+                      <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 min-[360px]:text-[10px] sm:text-[11px]">
                         {item.label}
                       </p>
 
-                      <p className="mt-1 truncate text-sm font-semibold text-slate-800 dark:text-white">
+                      <p className="mt-1 truncate text-xs font-semibold text-slate-800 dark:text-white min-[360px]:text-sm">
                         {item.value}
                       </p>
                     </div>
@@ -2020,13 +2054,14 @@ export function HistoryDashboard({
         ) : (
           <>
             {/* STATISTICS */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 min-[360px]:gap-3 sm:gap-4 xl:grid-cols-4">
               <StatCard
                 icon="description"
                 label="Total Reports"
                 value={statistics.total}
                 description="Final Reports in history"
                 iconClass="bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
+                isLoading={statsLoading}
               />
 
               <StatCard
@@ -2035,6 +2070,7 @@ export function HistoryDashboard({
                 value={statistics.excellent}
                 description="80% or higher"
                 iconClass="bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400"
+                isLoading={statsLoading}
               />
 
               <StatCard
@@ -2047,6 +2083,7 @@ export function HistoryDashboard({
                 }
                 description="Across scored reports"
                 iconClass="bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400"
+                isLoading={statsLoading}
               />
 
               <StatCard
@@ -2055,14 +2092,15 @@ export function HistoryDashboard({
                 value={statistics.needsReview}
                 description="Below 80%"
                 iconClass="bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400"
+                isLoading={statsLoading}
               />
             </div>
 
             {/* SEARCH / FILTER */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm dark:border-white/[0.07] dark:bg-white/[0.025] sm:p-4">
-              <div className="flex min-w-0 flex-col gap-3 lg:flex-row">
+            <div className="rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm dark:border-white/[0.07] dark:bg-white/[0.025] min-[360px]:rounded-2xl min-[360px]:p-3.5 sm:p-4">
+              <div className="flex min-w-0 flex-col gap-2.5 min-[360px]:gap-3 lg:flex-row">
                 <div className="relative min-w-0 flex-1">
-                  <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[19px] text-slate-400 sm:left-4 sm:text-[20px]">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[17px] text-slate-400 min-[360px]:left-3.5 min-[360px]:text-[19px] sm:left-4 sm:text-[20px]">
                     search
                   </span>
 
@@ -2073,12 +2111,12 @@ export function HistoryDashboard({
                       setSearch(event.target.value)
                     }
                     placeholder="Search course, code or type..."
-                    className="h-11 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 dark:border-white/[0.08] dark:bg-white/[0.035] dark:text-white dark:focus:bg-white/[0.05] sm:pl-11 sm:pr-4"
+                    className="h-10 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-xs text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 dark:border-white/[0.08] dark:bg-white/[0.035] dark:text-white dark:focus:bg-white/[0.05] min-[360px]:h-11 min-[360px]:pl-10 min-[360px]:text-sm sm:pl-11 sm:pr-4"
                   />
                 </div>
 
                 <div className="relative w-full min-w-0 lg:w-52">
-                  <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[19px] text-slate-400">
+                  <span className="material-symbols-outlined pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-slate-400 min-[360px]:left-3 min-[360px]:text-[19px]">
                     filter_list
                   </span>
 
@@ -2087,7 +2125,7 @@ export function HistoryDashboard({
                     onChange={(event) =>
                       setFilter(event.target.value)
                     }
-                    className="h-11 w-full min-w-0 max-w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-9 text-sm font-medium text-slate-700 outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/[0.08] dark:bg-white/[0.035] dark:text-slate-200"
+                    className="h-10 w-full min-w-0 max-w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 pl-8 pr-8 text-xs font-medium text-slate-700 outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/[0.08] dark:bg-white/[0.035] dark:text-slate-200 min-[360px]:h-11 min-[360px]:pl-10 min-[360px]:pr-9 min-[360px]:text-sm"
                   >
                     <option value="">All Statuses</option>
                     <option value="completed">Completed</option>
@@ -2095,7 +2133,7 @@ export function HistoryDashboard({
                     <option value="failed">Failed</option>
                   </select>
 
-                  <span className="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-slate-400">
+                  <span className="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[16px] text-slate-400 min-[360px]:right-3 min-[360px]:text-[18px]">
                     expand_more
                   </span>
                 </div>
@@ -2156,8 +2194,39 @@ export function HistoryDashboard({
                 {[0, 1, 2].map((i) => (
                   <div
                     key={i}
-                    className="h-24 animate-pulse rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/[0.07] dark:bg-white/[0.03]"
-                  />
+                    className="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm dark:border-white/[0.07] dark:bg-white/[0.025] sm:p-4"
+                  >
+                    <div className="flex flex-col gap-3.5 sm:gap-4 lg:flex-row lg:items-center">
+                      <div className="flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3">
+                        <SkeletonBlock className="h-10 w-10 shrink-0 rounded-xl sm:h-11 sm:w-11" />
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div className="flex gap-1.5">
+                            <SkeletonBlock className="h-4 w-16 rounded-md" />
+                            <SkeletonBlock className="h-4 w-20 rounded-full" />
+                          </div>
+                          <SkeletonBlock className="h-4 w-3/5" />
+                          <SkeletonBlock className="h-3 w-2/5" />
+                        </div>
+                      </div>
+
+                      <div className="w-full lg:w-52 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <SkeletonBlock className="h-3 w-16" />
+                          <SkeletonBlock className="h-3 w-8" />
+                        </div>
+                        <SkeletonBlock className="h-2 w-full rounded-full" />
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-2 border-t border-slate-100 pt-3 dark:border-white/[0.06] lg:flex lg:shrink-0 lg:items-center lg:border-t-0 lg:pt-0">
+                        {[0, 1, 2, 3].map((btn) => (
+                          <SkeletonBlock
+                            key={btn}
+                            className="h-10 w-full rounded-xl lg:w-10"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : entries.length === 0 ? (
@@ -2407,20 +2476,22 @@ function StatCard({
   value,
   description,
   iconClass,
+  isLoading = false,
 }: {
   icon: string;
   label: string;
   value: string | number;
   description: string;
   iconClass: string;
+  isLoading?: boolean;
 }) {
   return (
-    <div className="group min-w-0 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-white/[0.07] dark:bg-white/[0.025] sm:p-4">
+    <div className="group min-w-0 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-white/[0.07] dark:bg-white/[0.025] min-[360px]:rounded-2xl min-[360px]:p-3.5 sm:p-4">
       <div className="flex items-center justify-between">
         <div
-          className={`flex h-9 w-9 items-center justify-center rounded-xl sm:h-10 sm:w-10 ${iconClass}`}
+          className={`flex h-8 w-8 items-center justify-center rounded-xl min-[360px]:h-9 min-[360px]:w-9 sm:h-10 sm:w-10 ${iconClass}`}
         >
-          <span className="material-symbols-outlined text-[18px] sm:text-[20px]">
+          <span className="material-symbols-outlined text-[16px] min-[360px]:text-[18px] sm:text-[20px]">
             {icon}
           </span>
         </div>
@@ -2430,14 +2501,18 @@ function StatCard({
         </span>
       </div>
 
-      <div className="mt-3 sm:mt-4">
-        <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 sm:text-xs">
+      <div className="mt-2.5 min-[360px]:mt-3 sm:mt-4">
+        <p className="truncate text-[10px] font-semibold text-slate-500 dark:text-slate-400 min-[360px]:text-[11px] sm:text-xs">
           {label}
         </p>
 
-        <p className="mt-1 text-xl font-black tracking-tight text-slate-900 dark:text-white sm:text-2xl">
-          {value}
-        </p>
+        {isLoading ? (
+          <SkeletonBlock className="mt-1.5 h-5 w-12 min-[360px]:h-6 min-[360px]:w-14 sm:h-7 sm:w-16" />
+        ) : (
+          <p className="mt-1 text-lg font-black tracking-tight text-slate-900 dark:text-white min-[360px]:text-xl sm:text-2xl">
+            {value}
+          </p>
+        )}
 
         <p className="mt-1 hidden text-[11px] text-slate-400 dark:text-slate-500 sm:block">
           {description}

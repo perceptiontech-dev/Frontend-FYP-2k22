@@ -41,7 +41,7 @@ const LoginScreen = () => {
 
     const routeByRole = async () => {
       try {
-        const response = await fetch(`${baseUrl}/api/v1/users/me`, {
+        const response = await fetch(`${BASE_URL}/api/v1/users/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -13,6 +13,11 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+// ── API Base URL (single source of truth) ──────────────────────────────────
+// Vercel env variable: NEXT_PUBLIC_API_URL
+// Trailing slashes are stripped to prevent double-slash URLs.
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
+
 const SSUET_LOGO_URL =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuAw_Jy9oKpU48zPIiRFe5J9eDkOHLkxlx-moRd6vnn6lTW6gsK0U7BgBGmASmKvCNf03LEPRd6fX4R6FuigJrIyeIX8pveVxlpPy3skCeTXvfUkh8AHzHz-SuUbMosjCKJbahHrXnvP5OX0ucUUWBRp8e2IyREClansm0N-JRwzmtSazXzvnot2pWxcMhPKLIl5LBwz80Fh-UdW9DY1rhmiFgmNp1gR2qwyIU7dpGSzHXKu3Da7D4knlns4TylKkz1EVQ";
 
@@ -26,22 +31,16 @@ const LoginScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // ── Auto-redirect if already logged in ─────────────────────────────────
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
+    if (typeof window === "undefined") return;
 
     const token = localStorage.getItem("access_token");
-
-    if (!token) {
-      return;
-    }
-
-    const BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
+    if (!token) return;
 
     const routeByRole = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/v1/users/me`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/users/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -69,16 +68,13 @@ const LoginScreen = () => {
     routeByRole();
   }, [router]);
 
+  // ── Login handler ──────────────────────────────────────────────────────
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setIsLoading(true);
 
     try {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000";
-
-      const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -102,16 +98,14 @@ const LoginScreen = () => {
         localStorage.setItem("refresh_token", data.refresh_token || "");
       }
 
-      const userInfoResponse = await fetch(`${baseUrl}/api/v1/users/me`, {
+      const userInfoResponse = await fetch(`${API_BASE_URL}/api/v1/users/me`, {
         headers: {
           Authorization: `Bearer ${data.access_token}`,
         },
       });
 
       if (!userInfoResponse.ok) {
-        throw new Error(
-          "Login succeeded but failed to load user profile"
-        );
+        throw new Error("Login succeeded but failed to load user profile");
       }
 
       const userInfo = await userInfoResponse.json();
@@ -134,7 +128,6 @@ const LoginScreen = () => {
           LEFT SIDE — LOGIN
       ====================================================== */}
       <div className="w-full lg:w-1/2 min-h-screen flex flex-col justify-center items-center p-6 sm:p-8 relative overflow-hidden bg-[#F8FFFA]">
-
         {/* Background Image */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -154,7 +147,6 @@ const LoginScreen = () => {
 
         {/* Main Content */}
         <div className="w-full max-w-md relative z-10 flex flex-col items-center">
-
           {/* University Logo */}
           <div className="flex flex-col items-center mb-8 sm:mb-10 text-center">
             <div className="w-24 h-24 rounded-full border-4 border-primary p-1 mb-4 bg-white shadow-md">
@@ -168,24 +160,19 @@ const LoginScreen = () => {
             <h1 className="font-headline text-[24px] leading-8 font-bold text-primary text-center tracking-tight">
               Sir Syed University
               <br />
-
               <span className="text-[20px] leading-7 font-normal text-on-surface-variant">
                 of Engineering &amp; Technology
               </span>
             </h1>
           </div>
 
-          {/* =================================================
-              WHITE LOGIN CARD — NO GLASSMORPHISM
-          ================================================== */}
+          {/* WHITE LOGIN CARD */}
           <div className="w-full bg-white p-7 sm:p-8 rounded-xl shadow-xl border border-gray-200">
-
             {/* Heading */}
             <div className="mb-8 text-center">
-             <h2 className="text-[32px] leading-10 font-medium text-black mb-2 font-headline">
-  Welcome Back
-</h2>
-
+              <h2 className="text-[32px] leading-10 font-medium text-black mb-2 font-headline">
+                Welcome Back
+              </h2>
               <p className="text-[14px] leading-5 text-on-surface-variant">
                 Sign in to access the IntelliPaper dashboard.
               </p>
@@ -193,7 +180,6 @@ const LoginScreen = () => {
 
             {/* Form */}
             <form className="space-y-6" onSubmit={handleLogin}>
-
               {/* Email */}
               <div>
                 <label
@@ -242,15 +228,9 @@ const LoginScreen = () => {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowPassword((s) => !s)
-                    }
+                    onClick={() => setShowPassword((s) => !s)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/70 hover:text-primary transition-colors flex items-center justify-center"
-                    aria-label={
-                      showPassword
-                        ? "Hide password"
-                        : "Show password"
-                    }
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
@@ -293,22 +273,18 @@ const LoginScreen = () => {
           RIGHT SIDE — BRANDING
       ====================================================== */}
       <div className="hidden lg:flex w-1/2 min-h-screen bg-primary-container flex-col justify-center items-center relative overflow-hidden">
-
         {/* Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary-container via-primary to-on-primary-fixed-variant opacity-90 z-0" />
 
         {/* Decorative Circles */}
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary-fixed rounded-full mix-blend-overlay blur-3xl opacity-30" />
-
         <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-tertiary-fixed rounded-full mix-blend-overlay blur-3xl opacity-20" />
 
         {/* Content */}
         <div className="relative z-10 w-full max-w-lg p-12 flex flex-col items-start justify-center">
-
           {/* Powered By */}
           <div className="flex items-center gap-3 mb-6 bg-surface/10 backdrop-blur-md px-4 py-2 rounded-full border border-surface/20">
             <Sparkles className="text-on-primary-container w-5 h-5" />
-
             <span className="text-xs font-bold text-on-primary-container tracking-wider uppercase">
               Powered by Perception Tech
             </span>
@@ -318,7 +294,6 @@ const LoginScreen = () => {
           <h2 className="text-[48px] leading-[1.2] font-extrabold text-on-primary-container mb-6 tracking-tight">
             IntelliPaper
             <br />
-
             <span className="text-surface text-[32px] leading-10 font-bold">
               Exam Moderation AI
             </span>
@@ -333,11 +308,9 @@ const LoginScreen = () => {
 
           {/* Illustration */}
           <div className="w-full relative rounded-2xl overflow-hidden shadow-2xl border border-surface/10 aspect-video group">
-
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
 
             <div className="w-full h-full bg-surface-tint flex items-center justify-center relative overflow-hidden">
-
               {/* Decorative Lines */}
               <div className="absolute inset-0 opacity-20 flex flex-wrap gap-2 p-4">
                 <div className="w-1/3 h-2 bg-surface rounded-full" />
@@ -356,10 +329,8 @@ const LoginScreen = () => {
             <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
               <span className="flex h-3 w-3 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-fixed opacity-75" />
-
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-tertiary-fixed" />
               </span>
-
               <span className="text-xs font-semibold tracking-wide text-surface">
                 System Online
               </span>

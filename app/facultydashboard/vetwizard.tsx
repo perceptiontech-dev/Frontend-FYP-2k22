@@ -902,10 +902,8 @@ export default function VetWizard({
   onFinish,
   onHistorySaved,
 }: VetWizardProps) {
-  const baseUrl = (
-    process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:8000"
-  ).replace(/\/+$/, "");
-  const API = `${baseUrl}/api/v1`;
+  const BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
+  const API = `${BASE_URL}/api/v1`;
 
   const token = () =>
     typeof window !== "undefined" ? localStorage.getItem("access_token") || "" : "";

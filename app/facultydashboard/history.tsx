@@ -10,14 +10,11 @@ import { generateReportPDF } from "./pdfGenerator";
    API CONFIG
 ============================================================ */
 
-const RAW_BACKEND_API =
-  process.env.NEXT_PUBLIC_BACKEND_API ||
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "http://localhost:8000";
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
 
-const API_BASE = RAW_BACKEND_API.replace(/\/+$/, "").endsWith("/api/v1")
-  ? RAW_BACKEND_API.replace(/\/+$/, "")
-  : `${RAW_BACKEND_API.replace(/\/+$/, "")}/api/v1`;
+const API_BASE = API_BASE_URL.replace(/\/+$/, "").endsWith("/api/v1")
+  ? API_BASE_URL.replace(/\/+$/, "")
+  : `${API_BASE_URL.replace(/\/+$/, "")}/api/v1`;
 
 const PAGE_SIZE = 10;
 
